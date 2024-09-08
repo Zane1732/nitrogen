@@ -3,24 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Discord Nitro Generator</title>
-    <link rel="stylesheet" href="style.css">
+    <title>ZANEsTOOL - Nitro Generator</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
+        <h1 class="neon-text">ZANEsTOOL</h1>
+        <p class="neon-text">This tool was made by ZANE. For more info, add ZANE on Discord: <a href="https://discord.com/users/zane_0xo" class="neon-text">zane_0xo</a></p>
+
         <div id="password-section">
-            <h1 class="neon-text">Discord Nitro Generator</h1>
-            <input type="password" id="password-input" placeholder="Enter password">
-            <button id="password-submit" class="button-3d">Submit</button>
+            <form id="toolForm">
+                <label for="password" class="neon-text">Enter Password:</label>
+                <input type="password" id="password" required>
+
+                <label for="numGroups" class="neon-text">Number of Groups to Check:</label>
+                <input type="number" id="numGroups" value="50" required>
+
+                <button type="submit" class="button-3d">Run Tool</button>
+            </form>
         </div>
-        <div id="main-section" style="display: none;">
-            <h2 class="neon-text">Welcome to Zane's Nitro Generator!</h2>
-            <button id="generate-btn" class="button-3d">Generate Nitro Code</button>
-            <button id="exit-btn" class="button-3d">Exit</button>
-            <div id="result"></div>
-            <p class="footer">This tool was made by Zane. For support, contact Zane on Discord: <a href="https://discord.com/users/zane_ox0" class="neon-text">zane_ox0</a></p>
-        </div>
+
+        <div class="result" id="result"></div>
+        <div class="links" id="links"></div>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
