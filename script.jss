@@ -1,4 +1,4 @@
-const PASSWORD = "nitrogenbyzane";
+const PASSWORD = "zanenitrogen";
 
 document.getElementById('toolForm').addEventListener('submit', function(event) {
     event.preventDefault();
@@ -34,11 +34,9 @@ async function generateAndCheckCodes() {
                 return; // Exit the function as we found a valid non-expired link
             } else {
                 resultDiv.innerHTML += `<p>Rechecked code: ${generatedCode} - Expired</p>`;
-                // Continue to the next iteration to find another code
             }
         } else {
             resultDiv.innerHTML += `<p>Checked code: ${generatedCode} - Invalid</p>`;
-            // Continue to the next iteration to find another code
         }
         
         // Optional: Add a slight delay to avoid overwhelming resources
@@ -72,3 +70,4 @@ async function checkCodeExpiration(code) {
         .then(data => data.expired) // Replace 'expired' with the actual field in the response
         .catch(() => true); // Assume expired if the request fails
 }
+
