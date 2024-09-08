@@ -1,0 +1,144 @@
+/* Overall Body Style */
+body {
+    background-color: #000000; /* Black background */
+    color: #ffffff; /* White text color */
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    perspective: 1000px; /* Adds perspective for 3D effect */
+}
+
+/* Container for content */
+.container {
+    text-align: center;
+    color: #fff;
+    width: 80%;
+    max-width: 800px;
+}
+
+/* Neon Text Animation */
+.neon-text {
+    font-size: 2rem;
+    font-weight: bold;
+    text-shadow: 
+        0 0 5px #00ff00,
+        0 0 10px #00ff00,
+        0 0 15px #00ff00,
+        0 0 20px #ff0000,
+        0 0 30px #ff0000,
+        0 0 40px #ff0000,
+        0 0 50px #ff0000;
+    animation: neon-animation 1.5s infinite alternate;
+}
+
+@keyframes neon-animation {
+    0% {
+        color: #00ff00;
+        text-shadow: 
+            0 0 5px #00ff00,
+            0 0 10px #00ff00,
+            0 0 15px #00ff00,
+            0 0 20px #ff0000,
+            0 0 30px #ff0000,
+            0 0 40px #ff0000,
+            0 0 50px #ff0000;
+    }
+    100% {
+        color: #ff0000;
+        text-shadow: 
+            0 0 5px #ff0000,
+            0 0 10px #ff0000,
+            0 0 15px #ff0000,
+            0 0 20px #00ff00,
+            0 0 30px #00ff00,
+            0 0 40px #00ff00,
+            0 0 50px #00ff00;
+    }
+}
+
+/* Password Section */
+#password-section {
+    text-align: center;
+}
+
+#password-input {
+    padding: 10px;
+    font-size: 1rem;
+    border-radius: 5px;
+    border: 1px solid #555;
+    background: #333;
+    color: #fff;
+    margin: 10px 0;
+}
+
+/* Button Styles */
+button {
+    background: #111;
+    border: 2px solid #555;
+    color: #fff;
+    font-size: 1rem;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background: #222;
+    border-color: #777;
+    box-shadow: 0 6px 8px rgba(0,0,0,0.4);
+}
+
+/* Success and Error Messages */
+.success {
+    color: #00ff00; /* Neon green for success messages */
+}
+
+.error {
+    color: #ff0000; /* Neon red for error messages */
+}
+
+/* 3D Button Effect */
+.button-3d {
+    background: linear-gradient(145deg, #3e3e3e, #1e1e1e);
+    border: none;
+    border-radius: 10px;
+    box-shadow: 5px 5px 15px rgba(0,0,0,0.3), -5px -5px 15px rgba(255,255,255,0.1);
+    color: #fff;
+    font-size: 1rem;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.button-3d:hover {
+    box-shadow: 7px 7px 20px rgba(0,0,0,0.4), -7px -7px 20px rgba(255,255,255,0.2);
+}
+
+.button-3d:active {
+    box-shadow: inset 2px 2px 5px rgba(0,0,0,0.5);
+}
+
+/* Footer */
+.footer {
+    margin-top: 20px;
+}
+
+.footer a {
+    color: #00ff00; /* Neon green for links */
+}
+
+.footer a:hover {
+    text-decoration: underline;
+}
+
+/* Large Code Display */
+.code {
+    font-size: 1.5rem;
+    word-break: break-all;
+    margin-top: 20px;
+}
