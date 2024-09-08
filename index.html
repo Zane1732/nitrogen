@@ -3,66 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Premium Nitro Gen</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Nitro Code Checker</title>
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            background-color: #000;
-        }
-        
-        h1, p {
-            color: #00ff00;
-            text-align: center;
-        }
-        
-        .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-        }
-        
-        input, button {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 5px;
-            border: none;
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
             background-color: #333;
-            color: #00ff00;
-            font-size: 1.2em;
+            color: #fff;
         }
-        
+        #toolForm {
+            margin-bottom: 20px;
+        }
+        #password {
+            padding: 10px;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
         button:hover {
-            background-color: #00ff00;
-            color: #333;
-            transition: 0.3s;
+            background-color: #0056b3;
         }
-        
-        .result {
+        #result {
             margin-top: 20px;
-            color: #00ff00;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Premium Nitro Gen</h1>
-        <p>This tool was made by Zane. For issues, contact zane_ox0 on Discord.</p>
-        
-        <form id="toolForm">
-            <label for="password">Enter Password:</label>
-            <input type="password" id="password" required>
-            
-            <button type="submit" id="generateButton">Start Generating</button>
-        </form>
-        
-        <div class="result" id="result"></div>
-    </div>
-    
+    <h1>Nitro Code Checker</h1>
+    <form id="toolForm">
+        <input type="password" id="password" placeholder="Enter password" required>
+        <button type="submit">Submit</button>
+    </form>
+    <div id="result"></div>
     <script src="script.js"></script>
 </body>
 </html>
+
+
