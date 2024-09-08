@@ -1,82 +1,52 @@
 const correctPassword = "zane123"; // Replace with your desired password
 
-document.getElementById("password-submit").addEventListener("click", checkPassword);
-document.getElementById("generate-btn").addEventListener("click", startGenerating);
-document.getElementById("exit-btn").addEventListener("click", exitGenerator);
+document.getElementById("toolForm").addEventListener("submit", async function(event) {
+    event.preventDefault();
+    const password = document.getElementById("password").value;
+    const numGroups = parseInt(document.getElementById("numGroups").value, 10);
 
-let isGenerating = false;
+    if (password === correctPassword) {
+        document.getElementById("result").innerHTML = "<p class='neon-text'>Password correct! Tool is running...</p>";
+        document.getElementById("result").innerHTML += "<p class='neon-text'>Generating and checking Nitro codes...</p>";
 
-function checkPassword() {
-    const inputPassword = document.getElementById("password-input").value;
-    if (inputPassword === correctPassword) {
-        document.getElementById("password-section").style.display = "none";
-        document.getElementById("main-section").style.display = "block";
-    } else {
-        alert("Incorrect password! Please try again.");
-    }
-}
+        let validCodes = [];
 
-function startGenerating() {
-    if (isGenerating) return;
-    isGenerating = true;
+        for (let i = 0; i < numGroups; i++) {
+            let code = generateNitroCode();
+            let isValid = await checkCodeValidity(code);
 
-    const resultDiv = document.getElementById("result");
-    resultDiv.innerHTML = "";
-
-    // Variables to manage code generation and validation
-    let totalCodesChecked = 0;
-    const maxCodes = 90000; // Max codes to check
-    const bulkSize = 1000; // Size of each bulk validation
-
-    const statusMessage = document.createElement("p");
-    statusMessage.className = "neon-text";
-    statusMessage.innerText = "Generating and checking codes...";
-    resultDiv.appendChild(statusMessage);
-
-    const generateAndCheckCodes = () => {
-        let codesBatch = [];
-        for (let i = 0; i < bulkSize; i++) {
-            if (totalCodesChecked >= maxCodes) break;
-            totalCodesChecked++;
-            codesBatch.push(generateRandomCode());
+            if (isValid) {
+                validCodes.push(code);
+                document.getElementById("result").innerHTML += `<p class='neon-text'>Valid Code Found: <a href="${code}" class="neon-text">${code}</a></p>`;
+                // Optional: Update with a pause to simulate checking delay
+                await new Promise(resolve => setTimeout(resolve, 1000)); // 1 second delay
+            }
         }
 
-        // Display status
-        statusMessage.innerText = `Checking ${totalCodesChecked} codes...`;
+        if (validCodes.length === 0) {
+            document.getElementById("result").innerHTML += "<p class='neon-text'>No valid codes found.</p>";
+        }
+    } else {
+        document.getElementById("result").innerHTML = "<p class='error'>Incorrect password. Please try again.</p>";
+    }
+});
 
-        // Simulate checking codes in bulk
-        setTimeout(() => {
-            codesBatch.forEach(code => {
-                if (Math.random() <= 0.80) { // 80% chance to "find" a valid code
-                    const isValid = Math.random() <= 0.80; // 80% chance to "be valid"
-                    if (isValid) {
-                        resultDiv.innerHTML += `<p class="success code">🎉 Valid Nitro Code found: ${code}</p>`;
-                    }
-                }
-            });
-
-            // Continue generating and checking codes if we haven't reached the limit
-            if (totalCodesChecked < maxCodes) {
-                generateAndCheckCodes();
-            } else {
-                notifyCompletion();
-            }
-        }, 1000); // Slower delay to mimic checking speed
-    };
-
-    // Start generating and checking codes
-    generateAndCheckCodes();
-}
-
-function exitGenerator() {
-    const resultDiv = document.getElementById("result");
-    resultDiv.innerHTML = "<p class='error'>Generator has been exited!</p>";
-    isGenerating = false;
-}
-
-function generateRandomCode() {
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let nitroCode = 'https://discord.gift/';
+function generateNitroCode() {
+    const alphanumeric = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let code = '';
     for (let i = 0; i < 16; i++) {
-        nitro
+        code += alphanumeric.charAt(Math.floor(Math.random() * alphanumeric.length));
+    }
+    return `https://discord.gift/${code}`;
+}
 
+async function checkCodeValidity(code) {
+    // Simulate an API call or validation check
+    // In real use, you might make an actual network request here
+    return new Promise(resolve => {
+        setTimeout(() => {
+            // Simulate that 80% of codes are valid
+            resolve(Math.random() < 0.8);
+        }, 500); // Simulate a delay for checking
+    });
+}
