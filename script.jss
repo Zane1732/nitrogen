@@ -54,20 +54,17 @@ function generateNitroCode() {
 }
 
 async function checkCodeValidity(code) {
-    // Replace this with the actual API call to check code validity
-    const apiUrl = `https://api.example.com/checkValidity?code=${encodeURIComponent(code)}`;
+    const apiUrl = `/api/checkCodeValidity?code=${encodeURIComponent(code)}`;
     return fetch(apiUrl)
         .then(response => response.json())
-        .then(data => data.valid) // Replace 'valid' with the actual field in the response
+        .then(data => data.valid)
         .catch(() => false);
 }
 
 async function checkCodeExpiration(code) {
-    // Replace this with the actual API call to check code expiration
-    const apiUrl = `https://api.example.com/checkExpiration?code=${encodeURIComponent(code)}`;
+    const apiUrl = `/api/checkCodeExpiration?code=${encodeURIComponent(code)}`;
     return fetch(apiUrl)
         .then(response => response.json())
-        .then(data => data.expired) // Replace 'expired' with the actual field in the response
-        .catch(() => true); // Assume expired if the request fails
+        .then(data => data.expired)
+        .catch(() => true);
 }
-
