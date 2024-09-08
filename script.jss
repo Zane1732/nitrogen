@@ -1,4 +1,4 @@
-const PASSWORD = "zanenitrogen";
+const PASSWORD = "nitrogenbyzane";
 
 document.getElementById('toolForm').addEventListener('submit', function(event) {
     event.preventDefault();
