@@ -23,20 +23,22 @@ async function generateAndCheckCodes() {
 
     while (true) {
         const generatedCode = generateNitroCode();
-        const isValid = checkCodeValidity(generatedCode);
+        const isValid = await checkCodeValidity(generatedCode);
 
         if (isValid) {
-            // Simulate expiration check (you can customize this logic)
-            const isExpired = checkCodeExpiration(generatedCode);
+            // Recheck the code for expiration
+            const isExpired = await checkCodeExpiration(generatedCode);
             if (!isExpired) {
                 // Display the working link
                 resultDiv.innerHTML = `<p style='color: green;'>You got a real working Nitro link: <a href="${generatedCode}" target="_blank" style="color: #00ff00;">${generatedCode}</a></p>`;
                 return; // Exit the function as we found a valid non-expired link
             } else {
                 resultDiv.innerHTML += `<p>Rechecked code: ${generatedCode} - Expired</p>`;
+                // Continue to the next iteration to find another code
             }
         } else {
             resultDiv.innerHTML += `<p>Checked code: ${generatedCode} - Invalid</p>`;
+            // Continue to the next iteration to find another code
         }
         
         // Optional: Add a slight delay to avoid overwhelming resources
@@ -53,16 +55,18 @@ function generateNitroCode() {
     return code;
 }
 
-function checkCodeValidity(code) {
-    // Simulate checking if the code is valid
-    // For demo purposes, we assume all generated codes are "valid"
-    // You can replace this logic with actual validation rules if needed
-    return true; // Change this to your custom validation logic
+async function checkCodeValidity(code) {
+    // Simulate code validity check
+    // For demo purposes, all codes are considered valid
+    return new Promise(resolve => {
+        setTimeout(() => resolve(true), 100); // Simulate a delay
+    });
 }
 
-function checkCodeExpiration(code) {
-    // Simulate expiration check (e.g., assume codes expire after a certain period)
-    // For demo purposes, we assume all codes are "not expired"
-    return false; // Change this to your custom expiration logic
+async function checkCodeExpiration(code) {
+    // Simulate expiration check
+    // For demo purposes, all codes are considered non-expired
+    return new Promise(resolve => {
+        setTimeout(() => resolve(false), 100); // Simulate a delay
+    });
 }
-
