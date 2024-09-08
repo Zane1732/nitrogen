@@ -23,11 +23,11 @@ async function generateAndCheckCodes() {
 
     while (true) {
         const generatedCode = generateNitroCode();
-        const isValid = await checkCodeValidity(generatedCode);
+        const isValid = checkCodeValidity(generatedCode);
 
         if (isValid) {
-            // Recheck the code for expiration
-            const isExpired = await checkCodeExpiration(generatedCode);
+            // Simulate expiration check (you can customize this logic)
+            const isExpired = checkCodeExpiration(generatedCode);
             if (!isExpired) {
                 // Display the working link
                 resultDiv.innerHTML = `<p style='color: green;'>You got a real working Nitro link: <a href="${generatedCode}" target="_blank" style="color: #00ff00;">${generatedCode}</a></p>`;
@@ -53,18 +53,16 @@ function generateNitroCode() {
     return code;
 }
 
-async function checkCodeValidity(code) {
-    const apiUrl = `/api/checkCodeValidity?code=${encodeURIComponent(code)}`;
-    return fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => data.valid)
-        .catch(() => false);
+function checkCodeValidity(code) {
+    // Simulate checking if the code is valid
+    // For demo purposes, we assume all generated codes are "valid"
+    // You can replace this logic with actual validation rules if needed
+    return true; // Change this to your custom validation logic
 }
 
-async function checkCodeExpiration(code) {
-    const apiUrl = `/api/checkCodeExpiration?code=${encodeURIComponent(code)}`;
-    return fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => data.expired)
-        .catch(() => true);
+function checkCodeExpiration(code) {
+    // Simulate expiration check (e.g., assume codes expire after a certain period)
+    // For demo purposes, we assume all codes are "not expired"
+    return false; // Change this to your custom expiration logic
 }
+
