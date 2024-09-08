@@ -56,19 +56,25 @@ function generateNitroCode() {
 }
 
 async function checkCodeValidity(code) {
-    // Replace this with the actual API call to check code validity
-    const apiUrl = `https://api.example.com/checkValidity?code=${encodeURIComponent(code)}`;
-    return fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => data.valid) // Replace 'valid' with the actual field in the response
-        .catch(() => false);
+    try {
+        const apiUrl = `https://run.mocky.io/v3/b88bfae0-a26b-49d3-8bf4-17ba902986e3?code=${encodeURIComponent(code)}`;
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        return data.valid; // Directly return the 'valid' field from response
+    } catch (error) {
+        console.error('Error checking code validity:', error);
+        return false; // Assume invalid if the request fails
+    }
 }
 
 async function checkCodeExpiration(code) {
-    // Replace this with the actual API call to check code expiration
-    const apiUrl = `https://api.example.com/checkExpiration?code=${encodeURIComponent(code)}`;
-    return fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => data.expired) // Replace 'expired' with the actual field in the response
-        .catch(() => true); // Assume expired if the request fails
+    try {
+        const apiUrl = `https://run.mocky.io/v3/b88bfae0-a26b-49d3-8bf4-17ba902986e3?code=${encodeURIComponent(code)}`;
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        return data.expired; // Directly return the 'expired' field from response
+    } catch (error) {
+        console.error('Error checking code expiration:', error);
+        return true; // Assume expired if the request fails
+    }
 }
