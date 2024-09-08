@@ -3,30 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZANEsTOOL - Nitro Generator</title>
+    <title>Premium Nitro Gen</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background-color: #000;
+        }
+        
+        h1, p {
+            color: #00ff00;
+            text-align: center;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+        
+        input, button {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            background-color: #333;
+            color: #00ff00;
+            font-size: 1.2em;
+        }
+        
+        button:hover {
+            background-color: #00ff00;
+            color: #333;
+            transition: 0.3s;
+        }
+        
+        .result {
+            margin-top: 20px;
+            color: #00ff00;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1 class="neon-text">ZANEsTOOL</h1>
-        <p class="neon-text">This tool was made by ZANE. For more info, add ZANE on Discord: <a href="https://discord.com/users/zane_0xo" class="neon-text">zane_0xo</a></p>
-
-        <div id="password-section">
-            <form id="toolForm">
-                <label for="password" class="neon-text">Enter Password:</label>
-                <input type="password" id="password" required>
-
-                <label for="numGroups" class="neon-text">Number of Groups to Check:</label>
-                <input type="number" id="numGroups" value="50" required>
-
-                <button type="submit" class="button-3d">Run Tool</button>
-            </form>
-        </div>
-
+        <h1>Premium Nitro Gen</h1>
+        <p>This tool was made by Zane. For issues, contact zane_ox0 on Discord.</p>
+        
+        <form id="toolForm">
+            <label for="password">Enter Password:</label>
+            <input type="password" id="password" required>
+            
+            <button type="submit" id="generateButton">Start Generating</button>
+        </form>
+        
         <div class="result" id="result"></div>
-        <div class="links" id="links"></div>
     </div>
-
+    
     <script src="script.js"></script>
 </body>
 </html>
