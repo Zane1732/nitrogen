@@ -1,7 +1,7 @@
 const PASSWORD = "zanenitrogen";
 
 document.getElementById('toolForm').addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevent the form from reloading the page
+    event.preventDefault();
     startGenerating();
 });
 
@@ -56,17 +56,19 @@ function generateNitroCode() {
 }
 
 async function checkCodeValidity(code) {
-    // Simulate code validity check
-    // For demo purposes, all codes are considered valid
-    return new Promise(resolve => {
-        setTimeout(() => resolve(true), 100); // Simulate a delay
-    });
+    // Replace this with the actual API call to check code validity
+    const apiUrl = `https://api.example.com/checkValidity?code=${encodeURIComponent(code)}`;
+    return fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => data.valid) // Replace 'valid' with the actual field in the response
+        .catch(() => false);
 }
 
 async function checkCodeExpiration(code) {
-    // Simulate expiration check
-    // For demo purposes, all codes are considered non-expired
-    return new Promise(resolve => {
-        setTimeout(() => resolve(false), 100); // Simulate a delay
-    });
+    // Replace this with the actual API call to check code expiration
+    const apiUrl = `https://api.example.com/checkExpiration?code=${encodeURIComponent(code)}`;
+    return fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => data.expired) // Replace 'expired' with the actual field in the response
+        .catch(() => true); // Assume expired if the request fails
 }
