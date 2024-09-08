@@ -1,7 +1,7 @@
 const PASSWORD = "zanenitrogen";
 
 document.getElementById('toolForm').addEventListener('submit', function(event) {
-    event.preventDefault();
+    event.preventDefault(); // Prevent the form from reloading the page
     startGenerating();
 });
 
