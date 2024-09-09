@@ -26,7 +26,7 @@ label {
     margin: 10px 0 5px;
 }
 
-input[type="password"], input[type="number"], select, button, input[type="file"] {
+input[type="password"], input[type="url"], button {
     width: 100%;
     padding: 10px;
     margin-bottom: 10px;
@@ -37,7 +37,7 @@ input[type="password"], input[type="number"], select, button, input[type="file"]
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-input[type="password"]:focus, input[type="number"]:focus, select:focus, button:focus, input[type="file"]:focus {
+input[type="password"]:focus, input[type="url"]:focus, button:focus {
     transform: scale(1.05);
     box-shadow: 0 0 15px rgba(255, 0, 0, 0.7);
 }
@@ -50,4 +50,15 @@ button {
     border-radius: 5px;
     cursor: pointer;
     box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+}
+
+button:hover {
+    background-color: #000;
+    color: #f00;
+    transition: 0.3s;
+}
+
+.result {
+    margin-top: 20px;
+    color: #00ff00;
 }
