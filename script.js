@@ -26,7 +26,10 @@ function startGenerating() {
 
     resultDiv.innerHTML = "<p>Generating and checking codes...</p>";
     isGenerating = true;
-    generateAndCheckCodes(webhookUrl).finally(() => isGenerating = false);
+    generateAndCheckCodes(webhookUrl).finally(() => {
+        isGenerating = false;
+        resultDiv.innerHTML += "<p>Stopped generating codes.</p>";
+    });
 }
 
 async function generateAndCheckCodes(webhookUrl) {
@@ -39,14 +42,11 @@ async function generateAndCheckCodes(webhookUrl) {
             codeBatch.push(generateNitroCode());
         }
 
-        // Process the batch and check them in parallel
         const checkPromises = codeBatch.map(code => checkAndHandleCode(code, webhookUrl, resultDiv));
         await Promise.all(checkPromises);
 
         codesChecked += codeBatch.length;
-        if (codesChecked % 10 === 0) {
-            resultDiv.innerHTML += `<p>Checked ${codesChecked} codes...</p>`;
-        }
+        resultDiv.innerHTML += `<p>Checked ${codesChecked} codes...</p>`;
 
         // Adjust throttle based on progress
         await new Promise(resolve => setTimeout(resolve, rateLimitDelay));
@@ -131,4 +131,3 @@ async function sendToDiscordWebhook(webhookUrl, code) {
         console.error('Error sending code to Discord:', error);
     }
 }
-
