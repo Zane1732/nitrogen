@@ -1,64 +1,117 @@
-body {
-    font-family: 'Courier New', Courier, monospace;
-    margin: 0;
-    padding: 0;
-    background-color: #000;
-    color: #f00;
+const PASSWORD = "zanenitrogen";
+let isGenerating = false;
+
+document.getElementById('toolForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    if (isGenerating) return; // Prevent multiple submissions
+    startGenerating();
+});
+
+function startGenerating() {
+    const passwordInput = document.getElementById('password').value;
+    const webhookUrl = document.getElementById('webhookUrl').value;
+    const resultDiv = document.getElementById('result');
+
+    if (passwordInput !== PASSWORD) {
+        resultDiv.innerHTML = "<p style='color: red;'>Incorrect password</p>";
+        return;
+    }
+
+    if (!webhookUrl.startsWith('https://discord.com/api/webhooks/')) {
+        resultDiv.innerHTML = "<p style='color: red;'>Invalid Discord Webhook URL</p>";
+        return;
+    }
+
+    resultDiv.innerHTML = "<p>Generating and checking codes...</p>";
+    isGenerating = true;
+    generateAndCheckCodes(webhookUrl).finally(() => isGenerating = false);
 }
 
-.container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    background-color: rgba(0, 0, 0, 0.8);
-    border: 2px solid #f00;
-    border-radius: 15px;
-    box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
-    perspective: 1000px;
+async function generateAndCheckCodes(webhookUrl) {
+    const resultDiv = document.getElementById('result');
+    let codesChecked = 0;
+
+    while (isGenerating) {
+        const generatedCode = generateNitroCode();
+        const isValid = await checkCodeValidity(generatedCode);
+
+        codesChecked++;
+        if (isValid) {
+            const isExpired = await checkCodeExpiration(generatedCode);
+            if (!isExpired) {
+                resultDiv.innerHTML = `<p style='color: green;'>You got a real working Nitro link: <a href="${generatedCode}" target="_blank" style="color: #00ff00;">${generatedCode}</a></p>`;
+                await sendToDiscordWebhook(webhookUrl, generatedCode); // Send to Discord
+                return; // Stop on first valid non-expired code
+            } else {
+                resultDiv.innerHTML += `<p>Rechecked code ${generatedCode} - Expired</p>`;
+            }
+        } else {
+            resultDiv.innerHTML += `<p>Checked code ${generatedCode} - Invalid</p>`;
+        }
+
+        // Throttle loop to avoid overwhelming resources
+        await new Promise(resolve => setTimeout(resolve, 500)); // 500ms delay
+        if (codesChecked % 10 === 0) {
+            resultDiv.innerHTML += `<p>Checked ${codesChecked} codes...</p>`;
+        }
+    }
 }
 
-h1, p {
-    color: #f00;
+function generateNitroCode() {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let code = "https://discord.gift/";
+    for (let i = 0; i < 16; i++) {
+        code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return code;
 }
 
-label {
-    display: block;
-    margin: 10px 0 5px;
+async function checkCodeValidity(code) {
+    try {
+        const apiUrl = `https://run.mocky.io/v3/b88bfae0-a26b-49d3-8bf4-17ba902986e3?code=${encodeURIComponent(code)}`;
+        const response = await fetch(apiUrl, { cache: 'no-cache' }); // Prevent cached results
+        if (!response.ok) throw new Error(`API request failed: ${response.statusText}`);
+        const data = await response.json();
+        return data.valid === true;
+    } catch (error) {
+        console.error(`Error checking code validity for ${code}:`, error);
+        return false;
+    }
 }
 
-input[type="password"], input[type="url"], button {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #f00;
-    border-radius: 5px;
-    background-color: #222;
-    color: #f00;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+async function checkCodeExpiration(code) {
+    try {
+        const apiUrl = `https://run.mocky.io/v3/b88bfae0-a26b-49d3-8bf4-17ba902986e3?code=${encodeURIComponent(code)}`;
+        const response = await fetch(apiUrl, { cache: 'no-cache' });
+        if (!response.ok) throw new Error(`API request failed: ${response.statusText}`);
+        const data = await response.json();
+        return data.expired === true; // Explicitly check if expired is true
+    } catch (error) {
+        console.error(`Error checking code expiration for ${code}:`, error);
+        return true;
+    }
 }
 
-input[type="password"]:focus, input[type="url"]:focus, button:focus {
-    transform: scale(1.05);
-    box-shadow: 0 0 15px rgba(255, 0, 0, 0.7);
-}
+async function sendToDiscordWebhook(webhookUrl, code) {
+    const payload = {
+        content: `ZANE CODED GEN: ${code}`
+    };
 
-button {
-    padding: 10px 20px;
-    background-color: #f00;
-    color: #000;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
-}
+    try {
+        const response = await fetch(webhookUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
 
-button:hover {
-    background-color: #000;
-    color: #f00;
-    transition: 0.3s;
-}
+        if (!response.ok) {
+            throw new Error('Failed to send message to Discord');
+        }
 
-.result {
-    margin-top: 20px;
-    color: #00ff00;
+        console.log('Successfully sent Nitro code to Discord.');
+    } catch (error) {
+        console.error('Error sending code to Discord:', error);
+    }
 }
