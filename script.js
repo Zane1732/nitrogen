@@ -1,5 +1,9 @@
 const PASSWORD = "zanenitrogen";
 let isGenerating = false;
+const MAX_PARALLEL_CHECKS = 5; // Number of codes to check in parallel
+const CODE_POOL_SIZE = 100; // Number of pre-generated codes in pool
+let codePool = []; // Store pre-generated codes for better chances
+let rateLimitDelay = 500; // Adjust throttle based on rate limiting
 
 document.getElementById('toolForm').addEventListener('submit', function(event) {
     event.preventDefault();
@@ -31,29 +35,33 @@ async function generateAndCheckCodes(webhookUrl) {
     const resultDiv = document.getElementById('result');
     let codesChecked = 0;
 
-    while (isGenerating) {
-        const generatedCode = generateNitroCode();
-        const isValid = await checkCodeValidity(generatedCode);
+    // Pre-generate a pool of codes
+    for (let i = 0; i < CODE_POOL_SIZE; i++) {
+        codePool.push(generateNitroCode());
+    }
 
-        codesChecked++;
-        if (isValid) {
-            const isExpired = await checkCodeExpiration(generatedCode);
-            if (!isExpired) {
-                resultDiv.innerHTML = `<p style='color: green;'>You got a real working Nitro link: <a href="${generatedCode}" target="_blank" style="color: #00ff00;">${generatedCode}</a></p>`;
-                await sendToDiscordWebhook(webhookUrl, generatedCode); // Send to Discord
-                return; // Stop on first valid non-expired code
-            } else {
-                resultDiv.innerHTML += `<p>Rechecked code ${generatedCode} - Expired</p>`;
+    while (isGenerating) {
+        const codeBatch = codePool.splice(0, MAX_PARALLEL_CHECKS); // Take batch from pool
+        const checkPromises = codeBatch.map(code => checkAndHandleCode(code, webhookUrl, resultDiv));
+
+        // Wait for all checks in the batch to finish
+        await Promise.all(checkPromises);
+
+        // Refill code pool if it runs low
+        if (codePool.length < MAX_PARALLEL_CHECKS) {
+            for (let i = 0; i < CODE_POOL_SIZE; i++) {
+                codePool.push(generateNitroCode());
             }
-        } else {
-            resultDiv.innerHTML += `<p>Checked code ${generatedCode} - Invalid</p>`;
         }
 
-        // Throttle loop to avoid overwhelming resources
-        await new Promise(resolve => setTimeout(resolve, 500)); // 500ms delay
+        // Display progress after every 10 checks
+        codesChecked += codeBatch.length;
         if (codesChecked % 10 === 0) {
             resultDiv.innerHTML += `<p>Checked ${codesChecked} codes...</p>`;
         }
+
+        // Adjust throttle based on success or failure rate
+        await new Promise(resolve => setTimeout(resolve, rateLimitDelay));
     }
 }
 
@@ -64,6 +72,26 @@ function generateNitroCode() {
         code += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     return code;
+}
+
+async function checkAndHandleCode(code, webhookUrl, resultDiv) {
+    try {
+        const isValid = await checkCodeValidity(code);
+        if (isValid) {
+            const isExpired = await checkCodeExpiration(code);
+            if (!isExpired) {
+                resultDiv.innerHTML = `<p style='color: green;'>You got a real working Nitro link: <a href="${code}" target="_blank" style="color: #00ff00;">${code}</a></p>`;
+                await sendToDiscordWebhook(webhookUrl, code); // Send valid code to Discord
+                isGenerating = false; // Stop once we find a valid code
+            } else {
+                resultDiv.innerHTML += `<p>Rechecked code ${code} - Expired</p>`;
+            }
+        } else {
+            resultDiv.innerHTML += `<p>Checked code ${code} - Invalid</p>`;
+        }
+    } catch (error) {
+        console.error(`Error handling code ${code}:`, error);
+    }
 }
 
 async function checkCodeValidity(code) {
