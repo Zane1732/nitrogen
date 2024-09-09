@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Premium Nitro Gen</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Hide the YouTube iframe */
+        #backgroundMusic {
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -24,8 +30,9 @@
         <div class="result" id="result"></div>
     </div>
     
+    <!-- YouTube video embedded as background music -->
+    <iframe id="backgroundMusic" src="https://www.youtube.com/embed/lI-rZIdOZ6o?autoplay=1&loop=1&playlist=lI-rZIdOZ6o" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    
     <script src="script.js"></script>
 </body>
 </html>
-
-
