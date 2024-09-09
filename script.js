@@ -77,12 +77,8 @@ async function generateAndCheckCodes() {
             resultDiv.innerHTML += `<p>Checked code ${generatedCode} - Invalid</p>`;
         }
 
-        if (codesChecked % 10 === 0) {
-            resultDiv.innerHTML += `<p>Checked ${codesChecked} codes... (Valid: ${validCodes}, Expired: ${expiredCodes})</p>`;
-        }
-
-        // Throttle to avoid overwhelming resources
-        await new Promise(resolve => setTimeout(resolve, 1000)); // 1 second delay between requests
+        // Show continuous progress without delay
+        resultDiv.innerHTML += `<p>Progress: Checked ${codesChecked} codes (Valid: ${validCodes}, Expired: ${expiredCodes})</p>`;
     }
 
     resultDiv.innerHTML += `<p>Process finished. Total codes checked: ${codesChecked}, Valid: ${validCodes}, Expired: ${expiredCodes}</p>`;
@@ -109,7 +105,7 @@ async function checkCodeExpiration(code) {
     return data?.expired === true; // Null-check and ensure expired is true
 }
 
-async function fetchWithRetry(url, retries = 3, delay = 2000) {
+async function fetchWithRetry(url, retries = 3, delay = 1000) {
     for (let i = 0; i < retries; i++) {
         try {
             const response = await fetch(url, { cache: 'no-cache' });
@@ -122,4 +118,3 @@ async function fetchWithRetry(url, retries = 3, delay = 2000) {
     }
     return null; // Return null if all attempts fail
 }
-
