@@ -1,8 +1,6 @@
 const PASSWORD = "zanenitrogen";
 let isGenerating = false;
 const MAX_PARALLEL_CHECKS = 5; // Number of codes to check in parallel
-const CODE_POOL_SIZE = 100; // Number of pre-generated codes in pool
-let codePool = []; // Store pre-generated codes for better chances
 let rateLimitDelay = 500; // Adjust throttle based on rate limiting
 
 document.getElementById('toolForm').addEventListener('submit', function(event) {
@@ -35,32 +33,22 @@ async function generateAndCheckCodes(webhookUrl) {
     const resultDiv = document.getElementById('result');
     let codesChecked = 0;
 
-    // Pre-generate a pool of codes
-    for (let i = 0; i < CODE_POOL_SIZE; i++) {
-        codePool.push(generateNitroCode());
-    }
-
     while (isGenerating) {
-        const codeBatch = codePool.splice(0, MAX_PARALLEL_CHECKS); // Take batch from pool
-        const checkPromises = codeBatch.map(code => checkAndHandleCode(code, webhookUrl, resultDiv));
-
-        // Wait for all checks in the batch to finish
-        await Promise.all(checkPromises);
-
-        // Refill code pool if it runs low
-        if (codePool.length < MAX_PARALLEL_CHECKS) {
-            for (let i = 0; i < CODE_POOL_SIZE; i++) {
-                codePool.push(generateNitroCode());
-            }
+        const codeBatch = [];
+        for (let i = 0; i < MAX_PARALLEL_CHECKS; i++) {
+            codeBatch.push(generateNitroCode());
         }
 
-        // Display progress after every 10 checks
+        // Process the batch and check them in parallel
+        const checkPromises = codeBatch.map(code => checkAndHandleCode(code, webhookUrl, resultDiv));
+        await Promise.all(checkPromises);
+
         codesChecked += codeBatch.length;
         if (codesChecked % 10 === 0) {
             resultDiv.innerHTML += `<p>Checked ${codesChecked} codes...</p>`;
         }
 
-        // Adjust throttle based on success or failure rate
+        // Adjust throttle based on progress
         await new Promise(resolve => setTimeout(resolve, rateLimitDelay));
     }
 }
@@ -143,3 +131,4 @@ async function sendToDiscordWebhook(webhookUrl, code) {
         console.error('Error sending code to Discord:', error);
     }
 }
+
