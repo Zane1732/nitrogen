@@ -1,13 +1,21 @@
 const PASSWORD = "zanenitrogen";
+let isGenerating = false;
+let codesChecked = 0;
+let validCodes = 0;
+let expiredCodes = 0;
+const BASE_API_URL = 'https://run.mocky.io/v3/b88bfae0-a26b-49d3-8bf4-17ba902986e3';
+const MAX_PROCESS_TIME = 5 * 60 * 1000; // 5 minutes timeout
 
 document.getElementById('toolForm').addEventListener('submit', function(event) {
     event.preventDefault();
+    if (isGenerating) return; // Prevent multiple submissions
     startGenerating();
 });
 
 function startGenerating() {
     const passwordInput = document.getElementById('password').value;
     const resultDiv = document.getElementById('result');
+    const loadingSpinner = document.getElementById('loadingSpinner');
 
     if (passwordInput !== PASSWORD) {
         resultDiv.innerHTML = "<p style='color: red;'>Incorrect password</p>";
@@ -15,35 +23,63 @@ function startGenerating() {
     }
 
     resultDiv.innerHTML = "<p>Generating and checking codes...</p>";
-    generateAndCheckCodes();
+    loadingSpinner.style.display = 'block'; // Show loading spinner
+    isGenerating = true;
+    codesChecked = 0;
+    validCodes = 0;
+    expiredCodes = 0;
+
+    // Set a timeout to automatically stop the process after 5 minutes
+    setTimeout(() => {
+        isGenerating = false;
+        loadingSpinner.style.display = 'none';
+        resultDiv.innerHTML += "<p>Process timed out.</p>";
+    }, MAX_PROCESS_TIME);
+
+    generateAndCheckCodes().finally(() => {
+        isGenerating = false;
+        loadingSpinner.style.display = 'none'; // Hide loading spinner
+    });
+}
+
+function stopGenerating() {
+    isGenerating = false;
+    document.getElementById('result').innerHTML += "<p>Process stopped by the user.</p>";
 }
 
 async function generateAndCheckCodes() {
     const resultDiv = document.getElementById('result');
 
-    while (true) {
+    while (isGenerating) {
         const generatedCode = generateNitroCode();
         const isValid = await checkCodeValidity(generatedCode);
 
+        codesChecked++;
         if (isValid) {
-            // Recheck the code for expiration
             const isExpired = await checkCodeExpiration(generatedCode);
             if (!isExpired) {
-                // Display the working link
+                validCodes++;
                 resultDiv.innerHTML = `<p style='color: green;'>You got a real working Nitro link: <a href="${generatedCode}" target="_blank" style="color: #00ff00;">${generatedCode}</a></p>`;
-                return; // Exit the function as we found a valid non-expired link
+                console.log(`Valid code: ${generatedCode}`);
+                return; // Stop on first valid non-expired code
             } else {
-                resultDiv.innerHTML += `<p>Rechecked code: ${generatedCode} - Expired</p>`;
-                // Continue to the next iteration to find another code
+                expiredCodes++;
+                resultDiv.innerHTML += `<p>Rechecked code ${generatedCode} - Expired</p>`;
+                console.log(`Expired code: ${generatedCode}`);
             }
         } else {
-            resultDiv.innerHTML += `<p>Checked code: ${generatedCode} - Invalid</p>`;
-            // Continue to the next iteration to find another code
+            resultDiv.innerHTML += `<p>Checked code ${generatedCode} - Invalid</p>`;
         }
-        
-        // Optional: Add a slight delay to avoid overwhelming resources
-        await new Promise(resolve => setTimeout(resolve, 500));
+
+        if (codesChecked % 10 === 0) {
+            resultDiv.innerHTML += `<p>Checked ${codesChecked} codes... (Valid: ${validCodes}, Expired: ${expiredCodes})</p>`;
+        }
+
+        // Throttle to avoid overwhelming resources
+        await new Promise(resolve => setTimeout(resolve, 1000)); // 1 second delay between requests
     }
+
+    resultDiv.innerHTML += `<p>Process finished. Total codes checked: ${codesChecked}, Valid: ${validCodes}, Expired: ${expiredCodes}</p>`;
 }
 
 function generateNitroCode() {
@@ -56,25 +92,28 @@ function generateNitroCode() {
 }
 
 async function checkCodeValidity(code) {
-    try {
-        const apiUrl = `https://run.mocky.io/v3/b88bfae0-a26b-49d3-8bf4-17ba902986e3?code=${encodeURIComponent(code)}`;
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-        return data.valid; // Directly return the 'valid' field from response
-    } catch (error) {
-        console.error('Error checking code validity:', error);
-        return false; // Assume invalid if the request fails
-    }
+    const apiUrl = `${BASE_API_URL}?code=${encodeURIComponent(code)}`;
+    const data = await fetchWithRetry(apiUrl);
+    return data?.valid === true; // Null-check and ensure valid is true
 }
 
 async function checkCodeExpiration(code) {
-    try {
-        const apiUrl = `https://run.mocky.io/v3/b88bfae0-a26b-49d3-8bf4-17ba902986e3?code=${encodeURIComponent(code)}`;
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-        return data.expired; // Directly return the 'expired' field from response
-    } catch (error) {
-        console.error('Error checking code expiration:', error);
-        return true; // Assume expired if the request fails
-    }
+    const apiUrl = `${BASE_API_URL}?code=${encodeURIComponent(code)}`;
+    const data = await fetchWithRetry(apiUrl);
+    return data?.expired === true; // Null-check and ensure expired is true
 }
+
+async function fetchWithRetry(url, retries = 3, delay = 2000) {
+    for (let i = 0; i < retries; i++) {
+        try {
+            const response = await fetch(url, { cache: 'no-cache' });
+            if (!response.ok) throw new Error('Network response was not ok');
+            return await response.json();
+        } catch (error) {
+            console.error('Attempt', i + 1, 'failed:', error);
+            if (i < retries - 1) await new Promise(res => setTimeout(res, delay));
+        }
+    }
+    return null; // Return null if all attempts fail
+}
+
