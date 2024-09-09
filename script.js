@@ -27,7 +27,6 @@ function startGenerating() {
     resultDiv.innerHTML = "<p>Generating and checking codes...</p>";
     isGenerating = true;
     generateAndCheckCodes(webhookUrl).finally(() => {
-        isGenerating = false;
         resultDiv.innerHTML += "<p>Stopped generating codes.</p>";
     });
 }
@@ -68,11 +67,10 @@ async function checkAndHandleCode(code, webhookUrl, resultDiv) {
         if (isValid) {
             const isExpired = await checkCodeExpiration(code);
             if (!isExpired) {
-                resultDiv.innerHTML = `<p style='color: green;'>You got a real working Nitro link: <a href="${code}" target="_blank" style="color: #00ff00;">${code}</a></p>`;
+                resultDiv.innerHTML = `<p style='color: green;'>Valid Nitro link: <a href="${code}" target="_blank" style="color: #00ff00;">${code}</a></p>`;
                 await sendToDiscordWebhook(webhookUrl, code); // Send valid code to Discord
-                isGenerating = false; // Stop once we find a valid code
             } else {
-                resultDiv.innerHTML += `<p>Rechecked code ${code} - Expired</p>`;
+                resultDiv.innerHTML += `<p>Checked code ${code} - Expired</p>`;
             }
         } else {
             resultDiv.innerHTML += `<p>Checked code ${code} - Invalid</p>`;
@@ -101,7 +99,7 @@ async function checkCodeExpiration(code) {
         const response = await fetch(apiUrl, { cache: 'no-cache' });
         if (!response.ok) throw new Error(`API request failed: ${response.statusText}`);
         const data = await response.json();
-        return data.expired === true; // Explicitly check if expired is true
+        return data.expired === true;
     } catch (error) {
         console.error(`Error checking code expiration for ${code}:`, error);
         return true;
