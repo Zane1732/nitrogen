@@ -51,7 +51,13 @@ async function generateAndCheckCodes() {
     const resultDiv = document.getElementById('result');
 
     while (isGenerating) {
+        // Show generated code in the UI
         const generatedCode = generateNitroCode();
+        resultDiv.innerHTML += `<p>Generated code: ${generatedCode}</p>`;
+        
+        // Indicate checking process
+        resultDiv.innerHTML += `<p>Checking code: ${generatedCode}...</p>`;
+        
         const isValid = await checkCodeValidity(generatedCode);
 
         codesChecked++;
